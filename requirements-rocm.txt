@@ -2,3 +2,5 @@
 
 torch==2.5.0.dev20240726
 torchvision==0.20.0.dev20240726
+
+https://github.com/ROCm/flash-attention/releases/download/v2.5.9post1-cktile-vllm/flash_attn-2.5.9.post1-cp39-cp39-linux_x86_64.whl
