@@ -21,6 +21,7 @@ cd flash-attention
 git checkout v2.6.3
 GPU_ARGS="gfx90a" pip install -v .
 ```
+**Note: it might take hours to build flash-attention form source**
 
 # run benchmark
 
