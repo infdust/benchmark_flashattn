@@ -1,14 +1,6 @@
 import torch
 import time
-
-try:
-    import vllm_flash_attn as flash_attn
-except ModuleNotFoundError:
-    try:
-        import flash_attn
-    except ModuleNotFoundError:
-        print("Flash attention not found!")
-        exit(1)
+import flash_attn_2_cuda as flash_attn
 
 seqlen = 128 * 4
 warmup = 100
@@ -22,34 +14,54 @@ q, k, v = qkv.split([heads, kv_heads, kv_heads], dim=-2)
 seqlens = torch.tensor([0, seqlen], device='cuda', dtype=torch.int32)
 
 for _ in range(warmup):
-    flash_attn.flash_attn_varlen_func(
-        q=q,
-        k=k,
-        v=v,
-        cu_seqlens_q=seqlens,
-        cu_seqlens_k=seqlens,
-        max_seqlen_q=seqlen,
-        max_seqlen_k=seqlen,
-        softmax_scale=head_size**-0.5,
-        causal=True,
-        window_size=(-1, -1),
-        alibi_slopes=None,
+    flash_attn.varlen_fwd(
+        q,
+        k,
+        v,
+        None,
+        seqlens,
+        seqlens,
+        None,
+        None,
+        None,
+        None,
+        seqlen,
+        seqlen,
+        0.0,
+        head_size**-0.5,
+        False,
+        True,
+        -1,
+        -1,
+        0.0,
+        False,
+        None,
     )
 torch.cuda.synchronize()
 start_time = time.time()
 for _ in range(repeat):
-    flash_attn.flash_attn_varlen_func(
-        q=q,
-        k=k,
-        v=v,
-        cu_seqlens_q=seqlens,
-        cu_seqlens_k=seqlens,
-        max_seqlen_q=seqlen,
-        max_seqlen_k=seqlen,
-        softmax_scale=head_size**-0.5,
-        causal=True,
-        window_size=(-1, -1),
-        alibi_slopes=None,
+    flash_attn.varlen_fwd(
+        q,
+        k,
+        v,
+        None,
+        seqlens,
+        seqlens,
+        None,
+        None,
+        None,
+        None,
+        seqlen,
+        seqlen,
+        0.0,
+        head_size**-0.5,
+        False,
+        True,
+        -1,
+        -1,
+        0.0,
+        False,
+        None,
     )
 torch.cuda.synchronize()
 end_time = time.time()
