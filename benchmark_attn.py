@@ -31,6 +31,7 @@ if __name__ == "__main__":
             subprocess.run(['python3', script_impl_path] + args, cwd=tmp_dir)
 
         elif profiler == 'nsys':
+            subprocess.run(['pwd'], cwd=tmp_dir)
             subprocess.run(['nsys', 'start', '--capture-range=nvtx', '--force-overwrite=tune', '--output=rep', '--stats=true'], cwd=tmp_dir)
             subprocess.run(['nsys', 'launch', '--nvtx-capture=benchmark', '--env-var=NSYS_NVYX_PROFILER_REGISTER_ONLY=0', 'python3', script_impl_path] + args, cwd=tmp_dir)
             subprocess.run(['nsys', 'stats', '--force-export=true', '--format=csv', '--force-overwrite=true', '--output=rep', '--report=cuda_gpu_kernel_sum', 'rep.nsys-rep'], cwd=tmp_dir)
