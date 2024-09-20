@@ -8,10 +8,20 @@ except ModuleNotFoundError:
     pass
 use_roctx = False
 try:
-    import roctx
+    roctx_lib = ctypes.CDLL("libroctx64.so")
     use_roctx = True
-except ModuleNotFoundError:
+except OSError:
     pass
+if use_roctx:
+    # roctxRangePush(const char*)
+    roctx_lib.roctxRangePushA.argtypes = [ctypes.c_char_p]
+    roctx_lib.roctxRangePushA.restype = ctypes.c_int
+    def roctx_range_push(name):
+        roctx_lib.roctxRangePushA(name.encode('utf-8'))
+    # roctxRangePop()
+    roctx_lib.roctxRangePop.restype = ctypes.c_int
+    def roctx_range_pop():
+        roctx_lib.roctxRangePop()
 
 seqlen = 128 * 4
 warmup = 100
@@ -55,7 +65,7 @@ torch.cuda.synchronize()
 if use_nvtx:
     nvtx.range_push("benchmark")
 if use_roctx:
-    roctx.range_push("benchmark")
+    roctx_range_push("benchmark")
 start.record()
 for _ in range(repeat):
     flash_attn.varlen_fwd(
@@ -86,7 +96,7 @@ torch.cuda.synchronize()
 if use_nvtx:
     nvtx.range_pop()
 if use_roctx:
-    roctx.range_pop()
+    roctx_range_pop()
 
 duration = start.elapsed_time(end) * 1e3 / repeat
 print(f"Operator duration: {duration:.2f} us")
