@@ -1,32 +1,10 @@
 import torch
 import flash_attn_2_cuda as flash_attn
-use_nvtx = False
-try:
-    import torch.cuda.nvtx as nvtx
-    use_nvtx = True
-except ModuleNotFoundError:
-    pass
-use_roctx = False
-try:
-    import ctypes
-    roctx_lib = ctypes.CDLL("libroctx64.so")
-    use_roctx = True
-except OSError:
-    pass
-if use_roctx:
-    # roctxRangePush(const char*)
-    roctx_lib.roctxRangePushA.argtypes = [ctypes.c_char_p]
-    roctx_lib.roctxRangePushA.restype = ctypes.c_int
-    def roctx_range_push(name):
-        roctx_lib.roctxRangePushA(name.encode('utf-8'))
-    # roctxRangePop()
-    roctx_lib.roctxRangePop.restype = ctypes.c_int
-    def roctx_range_pop():
-        roctx_lib.roctxRangePop()
+import torch.cuda.nvtx as nvtx
 
-seqlen = 128 * 4
-warmup = 100
-repeat = 1000
+seqlen = 128
+warmup = 10
+repeat = 100
 heads = 32
 kv_heads = 32
 head_size = 128
@@ -63,10 +41,7 @@ for _ in range(warmup):
         None,
     )
 torch.cuda.synchronize()
-if use_nvtx:
-    nvtx.range_push("benchmark")
-if use_roctx:
-    roctx_range_push("benchmark")
+nvtx.range_push("benchmark")
 start.record()
 for _ in range(repeat):
     flash_attn.varlen_fwd(
@@ -94,10 +69,7 @@ for _ in range(repeat):
     )
 end.record()
 torch.cuda.synchronize()
-if use_nvtx:
-    nvtx.range_pop()
-if use_roctx:
-    roctx_range_pop()
+nvtx.range_pop()
 
 duration = start.elapsed_time(end) * 1e3 / repeat
 print(f"Operator duration: {duration:.2f} us")
