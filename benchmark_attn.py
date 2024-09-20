@@ -57,6 +57,8 @@ if __name__ == "__main__":
     parser.add_argument('--warmup', type=int, default=10)
     parser.add_argument('--repeat', type=int, default=100)
     parser.add_argument('--seq-lens', type=str, default='128')
+    args = parser.parse_args()
+
     seq_lens = [int(s) for s in numbers_str.split(',')] if args.seq_lens else []
     assert len(seq_lens) > 0
     max_seq_len = 0
