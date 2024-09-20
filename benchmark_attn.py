@@ -31,7 +31,7 @@ def run_flash_attn(q, k, v, acc_seq_lens, max_seq_len, scale):
 def run(acc_seq_lens, max_seq_len, total_seq_len, q_heads, kv_heads, head_size, warmup, repeat):
     qkv = torch.empty((total_seq_len, q_heads + kv_heads + kv_heads, head_size), device='cuda', dtype=torch.float16)
     q, k, v = qkv.split([q_heads, kv_heads, kv_heads], dim=-2)
-    seqlens = torch.tensor(acc_seq_lens, device='cuda', dtype=torch.int32)
+    acc_seq_lens = torch.tensor(acc_seq_lens, device='cuda', dtype=torch.int32)
 
     start = torch.cuda.Event(enable_timing=True)
     end = torch.cuda.Event(enable_timing=True)
