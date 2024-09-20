@@ -41,7 +41,7 @@ if __name__ == "__main__":
             subprocess.run(
                 [
                     ['nsys', 'start', '--capture-range=nvtx', '--force-overwrite=true', '--output=rep', '--stats=true'],
-                    ['nsys', 'launch', '--nvtx-capture=benchmark', '--env-var=NSYS_NVYX_PROFILER_REGISTER_ONLY=0', 'python3', script_impl_path] + args, cwd=tmp_dir)
+                    ['nsys', 'launch', '--nvtx-capture=benchmark', '--env-var=NSYS_NVYX_PROFILER_REGISTER_ONLY=0', 'python3', script_impl_path] + args,
                     ['nsys', 'stats', '--force-export=true', '--format=csv', '--force-overwrite=true', '--output=rep', '--report=cuda_gpu_kernel_sum', 'rep.nsys-rep']
                 ],
                 cwd=tmp_dir,
