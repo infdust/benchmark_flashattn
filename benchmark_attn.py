@@ -24,28 +24,22 @@ if __name__ == "__main__":
         except Exception as e:
             print("Error executing command:", e)
     profiler = args.profiler
-    args = [
-        '--q-heads', str(args.q_heads),
-        '--kv-heads', str(args.kv_heads),
-        '--head-size', str(args.head_size),
-        '--warmup', str(args.warmup),
-        '--repeat', str(args.repeat),
-        '--seq-lens', args.seq_lens,
-    ]
+    impl = f"python3 {script_impl_path} --q-heads {args.q_heads} --kv-heads {args.kv_heads} --head-size {args.head_size} --warmup {args.warmup} --repeat {args.repeat} --seq-lens {args.seq_lens}"
 
     try:
         if profiler == 'none':
             subprocess.run(['python3', script_impl_path] + args, cwd=tmp_dir)
 
         elif profiler == 'nsys':
-            subprocess.run(
-                [
-                    ['nsys', 'start', '--capture-range=nvtx', '--force-overwrite=true', '--output=rep', '--stats=true'],
-                    ['nsys', 'launch', '--nvtx-capture=benchmark', '--env-var=NSYS_NVYX_PROFILER_REGISTER_ONLY=0', 'python3', script_impl_path] + args,
-                    ['nsys', 'stats', '--force-export=true', '--format=csv', '--force-overwrite=true', '--output=rep', '--report=cuda_gpu_kernel_sum', 'rep.nsys-rep']
-                ],
-                cwd=tmp_dir,
-            )
+            with subprocess.Popen(['bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
+                commands = f"""
+                    nsys start --capture-range=nvtx --force-overwrite=true --output=rep --stats=true
+                    nsys launch --nvtx-capture=benchmark --env-var=NSYS_NVYX_PROFILER_REGISTER_ONLY=0 {impl}
+                    nsys stats --force-export=true --format=csv --force-overwrite=true --output=rep --report=cuda_gpu_kernel_sum rep.nsys-rep
+                """
+            stdout, stderr = proc.communicate(commands)
+            print(stdout)
+            print(stderr)
     except Exception as e:
         print("Error:", e)
     # print(f"duration: {duration:.2f} us")
