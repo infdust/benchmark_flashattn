@@ -8,6 +8,7 @@ except ModuleNotFoundError:
     pass
 use_roctx = False
 try:
+    import ctypes
     roctx_lib = ctypes.CDLL("libroctx64.so")
     use_roctx = True
 except OSError:
