@@ -24,7 +24,14 @@ if __name__ == "__main__":
         except Exception as e:
             print("Error executing command:", e)
     profiler = args.profiler
-    args = [arg for arg in sys.argv[1:] if arg != '--profiler' and arg != 'none']
+    args = [
+        '--q-heads', str(args.q_heads),
+        '--kv-heads', str(args.kv_heads),
+        '--head-size', str(args.head_size),
+        '--warmup', str(args.warmup),
+        '--repeat', str(args.repeat),
+        '--seq-lens', args.seq_lens,
+    ]
 
     try:
         if profiler == 'none':
