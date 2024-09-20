@@ -68,5 +68,5 @@ for _ in range(repeat):
 end.record()
 torch.cuda.synchronize()
 
-duration = start.elapsed_time(end) * 1e6 / repeat
+duration = start.elapsed_time(end) * 1e3 / repeat
 print(f"Operator duration: {duration:.2f} us")
