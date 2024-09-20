@@ -1,5 +1,5 @@
 import torch
-import flash_attn_2_cuda as flash_attntry:
+import flash_attn_2_cuda as flash_attn
 use_nvtx = False
 try:
     import nvtx
