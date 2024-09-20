@@ -57,6 +57,7 @@ if __name__ == "__main__":
     parser.add_argument('--warmup', type=int, default=10)
     parser.add_argument('--repeat', type=int, default=100)
     parser.add_argument('--seq-lens', type=str, default='128')
+    parser.add_argument('--profiler', type=str, default='none')
     args = parser.parse_args()
 
     seq_lens = [int(s) for s in args.seq_lens.split(',')] if args.seq_lens else []
@@ -64,10 +65,16 @@ if __name__ == "__main__":
     max_seq_len = 0
     total_seq_len = 0
     acc_seq_lens = [0]
+    flops = 0
     for seq_len in seq_lens:
         if seq_len > max_seq_len:
             max_seq_len = seq_len
         total_seq_len += seq_len
         acc_seq_lens.append(total_seq_len)
+        flops += 4 * seq_len * seq_len * args.q_heads * args.head_size
+    flops /= 1e12
+    bytes = 8 * total_seq_len * args.q_heads * args.head_size / 1e9
     duration = run(acc_seq_lens, max_seq_len, total_seq_len, args.q_heads, args.kv_heads, args.head_size, args.warmup, args.repeat)
-    print(f"Operator duration: {duration:.2f} us")
+    print(f"duration: {duration:.2f} us")
+    print(f"flops: {flops:.2f} Tflops")
+    print(f"bytes: {bytes:.2f} GB")
