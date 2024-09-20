@@ -28,7 +28,10 @@ if __name__ == "__main__":
 
     try:
         if profiler == 'none':
-            subprocess.run(['python3', script_impl_path] + args, cwd=tmp_dir)
+            with subprocess.Popen(['bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
+            stdout, stderr = proc.communicate(impl)
+            print(stdout)
+            print(stderr)
 
         elif profiler == 'nsys':
             with subprocess.Popen(['bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
