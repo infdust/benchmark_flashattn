@@ -29,7 +29,7 @@ if __name__ == "__main__":
     try:
         if profiler == 'none':
             with subprocess.Popen(['bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
-            stdout, stderr = proc.communicate(impl)
+                stdout, stderr = proc.communicate(impl)
             print(stdout)
             print(stderr)
 
@@ -40,7 +40,7 @@ if __name__ == "__main__":
                     nsys launch --nvtx-capture=benchmark --env-var=NSYS_NVYX_PROFILER_REGISTER_ONLY=0 {impl}
                     nsys stats --force-export=true --format=csv --force-overwrite=true --output=rep --report=cuda_gpu_kernel_sum rep.nsys-rep
                 """
-            stdout, stderr = proc.communicate(commands)
+                stdout, stderr = proc.communicate(commands)
             print(stdout)
             print(stderr)
     except Exception as e:
