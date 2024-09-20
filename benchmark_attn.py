@@ -36,9 +36,9 @@ if __name__ == "__main__":
         elif profiler == 'nsys':
             with subprocess.Popen(['bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
                 commands = f"""
-                    nsys start --capture-range=nvtx --force-overwrite=true --output=rep --stats=true
-                    nsys launch --nvtx-capture=benchmark --env-var=NSYS_NVYX_PROFILER_REGISTER_ONLY=0 {impl}
-                    nsys stats --force-export=true --format=csv --force-overwrite=true --output=rep --report=cuda_gpu_kernel_sum rep.nsys-rep
+                    nsys start -c nvtx -f true -o rep --stats=true
+                    nsys launch -p benchmark -e NSYS_NVYX_PROFILER_REGISTER_ONLY=0 {impl}
+                    nsys stats --force-export=true -f csv --force-overwrite=true -o rep -r cuda_gpu_kernel_sum rep.nsys-rep
                 """
                 stdout, stderr = proc.communicate(commands)
             print(stdout)
