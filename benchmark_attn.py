@@ -23,13 +23,19 @@ if __name__ == "__main__":
             subprocess.run(['mkdir', tmp_dir])
         except Exception as e:
             print("Error executing command:", e)
+    profiler = args.profiler
+    args = [arg for arg in sys.argv[1:] if arg != '--profiler' and arg != 'none']
 
-    if args.profiler == 'none':
-        args = [arg for arg in sys.argv[1:] if arg != '--profiler' and arg != 'none']
-        try:
-            print(subprocess.run(['python3', script_impl_path] + args, cwd=tmp_dir))
-        except Exception as e:
-            print("Error executing command:", e)
+    try:
+        if profiler == 'none':
+            subprocess.run(['python3', script_impl_path] + args, cwd=tmp_dir)
+
+        elif profiler == 'nsys':
+            subprocess.run(['nsys', 'start', '-c=nvtx', '-f=tune', '-o=rep', '--stats=true'], cwd=tmp_dir)
+            subprocess.run(['nsys', 'launch', '-w=true', '-p=benchmark', '-e=NSYS_NVYX_PROFILER_REGISTER_ONLY=0', 'python3', script_impl_path] + args, cwd=tmp_dir)
+            subprocess.run(['nsys', 'stats', '--force-export=true', '-f=csv', '--force-overwrite=true', '-o=rep', '-r=cuda_gpu_kernel_sum', 'rep.nsys-rep'], cwd=tmp_dir)
+    except Exception as e:
+        print("Error:", e)
     # print(f"duration: {duration:.2f} us")
     # print(f"flops: {flops:.2f} Tflops")
     # print(f"bytes: {bytes:.2f} GB")
