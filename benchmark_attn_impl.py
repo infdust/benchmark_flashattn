@@ -71,9 +71,8 @@ if __name__ == "__main__":
         total_seq_len += seq_len
         acc_seq_lens.append(total_seq_len)
         flops += 4 * seq_len * seq_len * args.q_heads * args.head_size
-    flops /= 1e12
-    bytes = 8 * total_seq_len * args.q_heads * args.head_size / 1e9
+    bytes = 8 * total_seq_len * args.q_heads * args.head_size
     duration = run(acc_seq_lens, max_seq_len, total_seq_len, args.q_heads, args.kv_heads, args.head_size, args.warmup, args.repeat)
     print(f"duration: {duration:.2f} us")
-    print(f"flops: {flops:.2f} Tflops")
-    print(f"bytes: {bytes:.2f} GB")
+    print(f"flops: {flops}")
+    print(f"bytes: {bytes}")
