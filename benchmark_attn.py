@@ -1,5 +1,17 @@
 import torch
-import flash_attn_2_cuda as flash_attn
+import flash_attn_2_cuda as flash_attntry:
+use_nvtx = False
+try:
+    import nvtx
+    use_nvtx = True
+except ModuleNotFoundError:
+    pass
+use_roctx = False
+try:
+    import roctx
+    use_roctx = True
+except ModuleNotFoundError:
+    pass
 
 seqlen = 128 * 4
 warmup = 100
@@ -40,6 +52,10 @@ for _ in range(warmup):
         None,
     )
 torch.cuda.synchronize()
+if use_nvtx:
+    nvtx_range_id = nvtx.range_start("benchmark")
+if use_roctx:
+    roctx_range_id = roctx.range_start("benchmark")
 start.record()
 for _ in range(repeat):
     flash_attn.varlen_fwd(
@@ -67,6 +83,10 @@ for _ in range(repeat):
     )
 end.record()
 torch.cuda.synchronize()
+if use_nvtx:
+    nvtx.range_end(nvtx_range_id)
+if use_roctx:
+    roctx.range_end(roctx_range_id)
 
 duration = start.elapsed_time(end) * 1e3 / repeat
 print(f"Operator duration: {duration:.2f} us")
