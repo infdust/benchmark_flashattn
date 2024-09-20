@@ -63,7 +63,7 @@ if __name__ == "__main__":
     assert len(seq_lens) > 0
     max_seq_len = 0
     total_seq_len = 0
-    acc_seq_lens = []
+    acc_seq_lens = [0]
     for seq_len in seq_lens:
         if seq_len > max_seq_len:
             max_seq_len = seq_len
