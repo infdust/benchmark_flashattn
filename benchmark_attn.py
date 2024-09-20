@@ -53,9 +53,9 @@ for _ in range(warmup):
     )
 torch.cuda.synchronize()
 if use_nvtx:
-    nvtx_range_id = nvtx.range_start("benchmark")
+    nvtx.range_push("benchmark")
 if use_roctx:
-    roctx_range_id = roctx.range_start("benchmark")
+    roctx.range_push("benchmark")
 start.record()
 for _ in range(repeat):
     flash_attn.varlen_fwd(
@@ -84,9 +84,9 @@ for _ in range(repeat):
 end.record()
 torch.cuda.synchronize()
 if use_nvtx:
-    nvtx.range_end(nvtx_range_id)
+    nvtx.range_pop()
 if use_roctx:
-    roctx.range_end(roctx_range_id)
+    roctx.range_pop()
 
 duration = start.elapsed_time(end) * 1e3 / repeat
 print(f"Operator duration: {duration:.2f} us")
