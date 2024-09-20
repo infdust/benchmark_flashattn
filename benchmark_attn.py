@@ -18,7 +18,7 @@ if __name__ == "__main__":
     parser.add_argument('--seq-lens', type=str, default='128')
     parser.add_argument('--profiler', type=str, default='none')
     args = parser.parse_args()
-    if !os.path.exists(tmp_dir):
+    if not os.path.exists(tmp_dir):
         try:
             subprocess.run(['mkdir', tmp_dir])
         except Exception as e:
@@ -26,9 +26,8 @@ if __name__ == "__main__":
 
     if args.profiler == 'none':
         args = [arg for arg in sys.argv[1:] if arg != '--profiler' and arg != 'none']
-        command = ["cd", tmp_dir, '&&', 'python3', script_impl_path] + args
         try:
-            print(subprocess.run(command))
+            print(subprocess.run(['python3', script_impl_path] + args, cwd=tmp_dir))
         except Exception as e:
             print("Error executing command:", e)
     # print(f"duration: {duration:.2f} us")
