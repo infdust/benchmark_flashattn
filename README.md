@@ -52,7 +52,7 @@ Five series are tested using four performance testing methods on two platforms:
 | rocm    | rocm     | none     |
 | rocprof | rocm     | rocprof  |
 
-The following charts show how performance varies with seq_len. Overall, rocm-version of flash-attention has a significant gap compared to cuda.
+The following charts show how performance varies with seq_lens. Overall, rocm-version of flash-attention has a significant gap compared to cuda.
 
 ### Single sequence
 
