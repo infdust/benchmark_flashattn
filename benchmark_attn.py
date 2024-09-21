@@ -24,20 +24,28 @@ if __name__ == "__main__":
         except Exception as e:
             print("Error executing command:", e)
     profiler = args.profiler
-    impl = f"python3 {script_impl_path} --q-heads {args.q_heads} --kv-heads {args.kv_heads} --head-size {args.head_size} --warmup {args.warmup} --repeat {args.repeat} --seq-lens {args.seq_lens}"
+    benchmark_impl = f"""
+    python3 {script_impl_path} \
+    --q-heads {args.q_heads} \
+    --kv-heads {args.kv_heads} \
+    --head-size {args.head_size} \
+    --warmup {args.warmup} \
+    --repeat {args.repeat} \
+    --seq-lens {args.seq_lens}
+    """
 
     try:
         if profiler == 'none':
-            with subprocess.Popen(['bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
+            with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
                 stdout, stderr = proc.communicate(impl)
             print(stdout)
             print(stderr)
 
         elif profiler == 'nsys':
-            with subprocess.Popen(['bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
+            with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
                 commands = f"""
                     nsys start -c nvtx -f true -o rep --stats=true
-                    nsys launch -p benchmark -e NSYS_NVTX_PROFILER_REGISTER_ONLY=0 {impl}
+                    nsys launch -p benchmark -e NSYS_NVTX_PROFILER_REGISTER_ONLY=0 {benchmark_impl}
                     nsys stats --force-export=true -f csv --force-overwrite=true -o rep -r cuda_gpu_kern_sum rep.nsys-rep
                 """
                 stdout, stderr = proc.communicate(commands)
