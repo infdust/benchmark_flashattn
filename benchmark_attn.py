@@ -35,7 +35,7 @@ if __name__ == "__main__":
     try:
         if profiler == 'none':
             with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
-                stdout, stderr = proc.communicate(impl)
+                stdout, stderr = proc.communicate(benchmark_impl)
             print(stdout)
             print(stderr)
 
@@ -45,6 +45,7 @@ if __name__ == "__main__":
                     nsys start -c nvtx -f true -o rep --stats=true
                     nsys launch -p benchmark -e NSYS_NVTX_PROFILER_REGISTER_ONLY=0 {benchmark_impl}
                     nsys stats --force-export=true -f csv --force-overwrite=true -o rep -r cuda_gpu_kern_sum rep.nsys-rep
+                    mv rep_cuda_gpu_kern_sum.csv rep.csv
                 """
                 stdout, stderr = proc.communicate(commands)
             print(stdout)
@@ -63,9 +64,8 @@ if __name__ == "__main__":
         elif profiler == 'rocprof':
             with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
                 commands = f"""
-                    nsys start -c nvtx -f true -o rep --stats=true
-                    nsys launch -p benchmark -e NSYS_NVTX_PROFILER_REGISTER_ONLY=0 {benchmark_impl}
-                    nsys stats --force-export=true -f csv --force-overwrite=true -o rep -r cuda_gpu_kern_sum rep.nsys-rep
+                    echo -e "pmc:\nkernel: mha Attention" > input.txt
+                    rocprof -i input.txt --hsa-trace -o rep.csv {benchmark_impl}
                 """
                 stdout, stderr = proc.communicate(commands)
             print(stdout)
