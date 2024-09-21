@@ -52,7 +52,7 @@ if __name__ == "__main__":
             proc = subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             stdout, stderr = proc.communicate(benchmark_impl)
             if proc.returncode != 0:
-                raise subprocess.CalledProcessError(proc.returncode, ['bash'], output=stdout, stderr=stderr)
+                raise subprocess.CalledProcessError(proc.returncode, commands, output=stdout, stderr=stderr)
             time_us = float(stdout)
 
         elif profiler == 'nsys':
@@ -65,7 +65,7 @@ if __name__ == "__main__":
             """
             stdout, stderr = proc.communicate(commands)
             if proc.returncode != 0:
-                raise subprocess.CalledProcessError(proc.returncode, ['bash'], output=stdout, stderr=stderr)
+                raise subprocess.CalledProcessError(proc.returncode, commands, output=stdout, stderr=stderr)
             df = pd.read_csv(output_path)
             time_us = df["Avg (ns)"][0] / 1e3
 
@@ -77,7 +77,7 @@ if __name__ == "__main__":
             """
             stdout, stderr = proc.communicate(commands)
             if proc.returncode != 0:
-                raise subprocess.CalledProcessError(proc.returncode, ['bash'], output=stdout, stderr=stderr)
+                raise subprocess.CalledProcessError(proc.returncode, commands, output=stdout, stderr=stderr)
             df = pd.read_csv(output_path)
             time_us = df["Average"][0]
 
@@ -89,7 +89,7 @@ if __name__ == "__main__":
             """
             stdout, stderr = proc.communicate(commands)
             if proc.returncode != 0:
-                raise subprocess.CalledProcessError(proc.returncode, ['bash'], output=stdout, stderr=stderr)
+                raise subprocess.CalledProcessError(proc.returncode, commands, output=stdout, stderr=stderr)
             df = pd.read_csv(output_path)
             time_us = df["DurationNs"][args.warmup:-1].mean() / 1e3
 
