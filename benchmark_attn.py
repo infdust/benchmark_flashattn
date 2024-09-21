@@ -50,7 +50,7 @@ if __name__ == "__main__":
                 """
                 stdout, stderr = proc.communicate(commands)
             df = pd.read_csv(output_path)
-            time_us = df["Avg (ns)"] / 1e3
+            time_us = df["Avg (ns)"][0] / 1e3
 
         elif profiler == 'ncu':
             with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
@@ -60,7 +60,7 @@ if __name__ == "__main__":
                 """
                 stdout, stderr = proc.communicate(commands)
             df = pd.read_csv(output_path)
-            time_us = df["Average"]
+            time_us = df["Average"][0]
 
         elif profiler == 'rocprof':
             with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
