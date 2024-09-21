@@ -21,7 +21,7 @@ cd flash-attention
 git checkout v2.6.3
 GPU_ARGS="gfx90a" pip install -v .
 ```
-**Note: it might take hours to build flash-attention form source**
+**Note: it might take hours to build flash-attention form source**  
 
 # run benchmark
 
@@ -29,13 +29,32 @@ GPU_ARGS="gfx90a" pip install -v .
 python3 benchmark_attn.py [options]
 ```
 
-Here's the avalible options:
-| Argument          | Description                           |
-|-------------------|---------------------------------------|
+Here're the avalible options:  
+| Argument          | Description |                          
+|-------------------|-------------|
 | --q-heads(=32)    | Num of heads for Q tensors
 | --kv-heads(=32)   | Num of heads for KV tensors
 | --head-size(=128) | Head size for QKV tensors
 | --warmup(=10)     | Num of iterations in warmup
 | --repeat(=100)    | Num of iterations in benchmarking
 | --seq-lens(=128)  | Length of each sequences. Can be one or more integers seprated by ','
-| --profiler(=none) | Method for recording kernel execution time.<br>Available options: none(use cuda event), ncu, nsys, rocprof.<br>Requires corresponding tools installed except for 'none'.
+| --profiler(=none) | Method for recording kernel execution time.<br>Available options: none(use cuda event), ncu, nsys, rocprof.<br>Requires corresponding tools installed except for 'none'.  
+
+# result
+
+The following results are based on the Referenced environment, running on MI210(rocm, 181Tflops, 1.64TB/s) and RTX4090(cuda, 165Tflops, 1.01TB/s).  
+Five series are tested using four performance testing methods on two platforms:  
+| Series  | Platform | profiler |
+|---------|----------|----------|
+| cuda    | cuda     | none     |
+| ncu     | cuda     | ncu      |
+| nsys    | cuda     | nsys     |
+| rocm    | rocm     | none     |
+| rocprof | rocm     | rocprof  |
+
+The parameter '--seq-lens' is set to: '128', '256', '512', '1024'. This means a single sequence of variable length is passed in at a time.  
+The following charts show how performance varies with seq_len. Overall, rocm-version of flash-attention has a significant gap compared to cuda.  
+
+<img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/duration.png" alt="duration" width="600"/>
+<img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/performance.png" alt="performance" width="600"/>
+<img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/bandwidth.png" alt="bandwidth" width="600"/>
