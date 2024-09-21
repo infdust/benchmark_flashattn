@@ -42,7 +42,7 @@ Here're the avalible options:
 
 # result
 
-The following results are based on the Referenced environment, running on MI210(rocm, 181Tflops, 1.64TB/s) and RTX4090(cuda, 165Tflops, 1.01TB/s).  
+The following results are based on the Referenced environment(docker image), running on MI210(rocm, 181Tflops, 1.64TB/s) and RTX4090(cuda, 165Tflops, 1.01TB/s).  
 Five series are tested using four performance testing methods on two platforms:  
 | Series  | Platform | profiler |
 |---------|----------|----------|
