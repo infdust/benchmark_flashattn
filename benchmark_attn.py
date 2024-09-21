@@ -93,9 +93,14 @@ if __name__ == "__main__":
             df = pd.read_csv(output_path)
             time_us = df["DurationNs"][args.warmup:-1].mean() / 1e3
 
+    except subprocess.CalledProcessError as e:
+        print(f"Command '{e.cmd}' failed with return code {e.returncode}")
+        print(f"Output: {e.output.decode('utf-8')}")
+        print(f"Error: {e.stderr.decode('utf-8')}")
+        raise
     except Exception as e:
         print("Error:", e)
-        exit(1)
+        raise
     print(f"arguments: seq_lens={args.seq_lens}, heads={args.q_heads}, kvheads={args.kv_heads}, head_size={args.head_size}")
     print(f"duration: {time_us:.2f} us")
     print(f"flops: {flops/time_us/1e6:.2f} Tflops")
