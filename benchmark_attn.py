@@ -51,6 +51,8 @@ if __name__ == "__main__":
         if profiler == 'none':
             proc = subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             stdout, stderr = proc.communicate(benchmark_impl)
+            if process.returncode != 0:
+                raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
             time_us = float(stdout)
 
         elif profiler == 'nsys':
@@ -62,6 +64,8 @@ if __name__ == "__main__":
                 mv output_cuda_gpu_kern_sum.csv {output_path}
             """
             stdout, stderr = proc.communicate(commands)
+            if process.returncode != 0:
+                raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
             df = pd.read_csv(output_path)
             time_us = df["Avg (ns)"][0] / 1e3
 
@@ -72,6 +76,8 @@ if __name__ == "__main__":
                 ncu -i output.ncu-rep --print-summary per-nvtx --csv > {output_path}
             """
             stdout, stderr = proc.communicate(commands)
+            if process.returncode != 0:
+                raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
             df = pd.read_csv(output_path)
             time_us = df["Average"][0]
 
@@ -82,13 +88,11 @@ if __name__ == "__main__":
                 rocprof -i input.txt --hsa-trace -o {output_path} {benchmark_impl}
             """
             stdout, stderr = proc.communicate(commands)
+            if process.returncode != 0:
+                raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
             df = pd.read_csv(output_path)
             time_us = df["DurationNs"][args.warmup:-1].mean() / 1e3
 
-        
-        if process.returncode != 0:
-            raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
-            exit(1)
     except Exception as e:
         print("Error:", e)
         exit(1)
