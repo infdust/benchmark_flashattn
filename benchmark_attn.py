@@ -49,6 +49,27 @@ if __name__ == "__main__":
                 stdout, stderr = proc.communicate(commands)
             print(stdout)
             print(stderr)
+
+        elif profiler == 'ncu':
+            with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
+                commands = f"""
+                    ncu -f --nvtx --print-summary per-nvtx --kernel-id ::flash_fwd_kernel: --csv --metrics gpu__time_duration.avg -o rep {benchmark_impl}
+                    ncu -i rep.ncu-rep --print-summary per-nvtx --csv > rep.csv
+                """
+                stdout, stderr = proc.communicate(commands)
+            print(stdout)
+            print(stderr)
+
+        elif profiler == 'rocprof':
+            with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
+                commands = f"""
+                    nsys start -c nvtx -f true -o rep --stats=true
+                    nsys launch -p benchmark -e NSYS_NVTX_PROFILER_REGISTER_ONLY=0 {benchmark_impl}
+                    nsys stats --force-export=true -f csv --force-overwrite=true -o rep -r cuda_gpu_kern_sum rep.nsys-rep
+                """
+                stdout, stderr = proc.communicate(commands)
+            print(stdout)
+            print(stderr)
     except Exception as e:
         print("Error:", e)
     # print(f"duration: {duration:.2f} us")
