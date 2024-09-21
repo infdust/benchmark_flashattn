@@ -26,11 +26,11 @@ if __name__ == "__main__":
     flops = 0
     bytes = 0
     for seq_len in seq_lens:
-        # q * k
-        flops += 2 * seq_len * seq_len * (args.q_heads * args.head_size)
+        # q * k (causal masked)
+        flops += 2 * (seq_len * (seq_len + 1) / 2) * (args.q_heads * args.head_size)
         bytes += 2 * (seq_len * args.q_heads * args.head_size + args.q_heads * args.head_size * seq_len)
-        # qk * v
-        flops += 2 * seq_len * (args.q_heads * args.head_size) * seq_len
+        # qk * v (causal masked)
+        flops += 2 * (seq_len * (seq_len + 1) / 2) * (args.q_heads * args.head_size)
         bytes += 2 * (args.q_heads * args.head_size * seq_len + seq_len * args.q_heads * args.head_size)
     
     if not os.path.exists(tmp_dir):
