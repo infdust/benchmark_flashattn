@@ -20,6 +20,15 @@ if __name__ == "__main__":
     parser.add_argument('--seq-lens', type=str, default='128')
     parser.add_argument('--profiler', type=str, default='none')
     args = parser.parse_args()
+
+    seq_lens = [int(s) for s in args.seq_lens.split(',')] if args.seq_lens else []
+    assert len(seq_lens) > 0
+    flops = 0
+    bytes = 0
+    for seq_len in seq_lens:
+        flops += 4 * seq_len * seq_len * args.q_heads * args.head_size
+        bytes += 8 * seq_len * args.q_heads * args.head_size
+    
     if not os.path.exists(tmp_dir):
         try:
             subprocess.run(['mkdir', tmp_dir])
@@ -74,5 +83,5 @@ if __name__ == "__main__":
     except Exception as e:
         print("Error:", e)
     print(f"duration: {time_us:.2f} us")
-    # print(f"flops: {flops:.2f} Tflops")
-    # print(f"bytes: {bytes:.2f} GB")
+    print(f"{flops/time_us/1e6:.2f} Tflops")
+    print(f"{bytes/time_us/1e3:.2f} GB/s")
