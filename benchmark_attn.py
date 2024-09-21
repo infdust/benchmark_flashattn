@@ -37,8 +37,8 @@ if __name__ == "__main__":
             with subprocess.Popen(['bash'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
                 commands = f"""
                     nsys start -c nvtx -f true -o rep --stats=true
-                    nsys launch -p benchmark -e NSYS_NVYX_PROFILER_REGISTER_ONLY=0 {impl}
-                    nsys stats --force-export=true -f csv --force-overwrite=true -o rep -r cuda_gpu_kernel_sum rep.nsys-rep
+                    nsys launch -p benchmark -e NSYS_NVTX_PROFILER_REGISTER_ONLY=0 {impl}
+                    nsys stats --force-export=true -f csv --force-overwrite=true -o rep -r cuda_gpu_kern_sum rep.nsys-rep
                 """
                 stdout, stderr = proc.communicate(commands)
             print(stdout)
