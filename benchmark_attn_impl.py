@@ -64,15 +64,10 @@ if __name__ == "__main__":
     max_seq_len = 0
     total_seq_len = 0
     acc_seq_lens = [0]
-    flops = 0
     for seq_len in seq_lens:
         if seq_len > max_seq_len:
             max_seq_len = seq_len
         total_seq_len += seq_len
         acc_seq_lens.append(total_seq_len)
-        flops += 4 * seq_len * seq_len * args.q_heads * args.head_size
-    bytes = 8 * total_seq_len * args.q_heads * args.head_size
     duration = run(acc_seq_lens, max_seq_len, total_seq_len, args.q_heads, args.kv_heads, args.head_size, args.warmup, args.repeat)
-    print(f"duration: {duration:.2f} us")
-    print(f"flops: {flops}")
-    print(f"bytes: {bytes}")
+    print(duration)
