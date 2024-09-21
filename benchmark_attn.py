@@ -24,15 +24,13 @@ if __name__ == "__main__":
         except Exception as e:
             print("Error executing command:", e)
     profiler = args.profiler
-    benchmark_impl = f"""
-    python3 {script_impl_path} \
+    benchmark_impl = f"""python3 {script_impl_path} \
     --q-heads {args.q_heads} \
     --kv-heads {args.kv_heads} \
     --head-size {args.head_size} \
     --warmup {args.warmup} \
     --repeat {args.repeat} \
-    --seq-lens {args.seq_lens}
-    """
+    --seq-lens {args.seq_lens}"""
 
     try:
         if profiler == 'none':
