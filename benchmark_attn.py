@@ -95,8 +95,8 @@ if __name__ == "__main__":
 
     except subprocess.CalledProcessError as e:
         print(f"Command '{e.cmd}' failed with return code {e.returncode}")
-        print(f"Output: {e.output.decode('utf-8')}")
-        print(f"Error: {e.stderr.decode('utf-8')}")
+        print(f"Output: {e.output}")
+        print(f"Error: {e.stderr}")
         raise
     print(f"arguments: seq_lens={args.seq_lens}, heads={args.q_heads}, kvheads={args.kv_heads}, head_size={args.head_size}")
     print(f"duration: {time_us:.2f} us")
