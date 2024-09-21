@@ -98,9 +98,6 @@ if __name__ == "__main__":
         print(f"Output: {e.output.decode('utf-8')}")
         print(f"Error: {e.stderr.decode('utf-8')}")
         raise
-    except Exception as e:
-        print("Error:", e)
-        raise
     print(f"arguments: seq_lens={args.seq_lens}, heads={args.q_heads}, kvheads={args.kv_heads}, head_size={args.head_size}")
     print(f"duration: {time_us:.2f} us")
     print(f"flops: {flops/time_us/1e6:.2f} Tflops")
