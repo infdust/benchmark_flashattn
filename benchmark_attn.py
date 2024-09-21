@@ -49,41 +49,45 @@ if __name__ == "__main__":
 
     try:
         if profiler == 'none':
-            with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
-                stdout, stderr = proc.communicate(benchmark_impl)
+            proc = subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            stdout, stderr = proc.communicate(benchmark_impl)
             time_us = float(stdout)
 
         elif profiler == 'nsys':
-            with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
-                commands = f"""
-                    nsys start -c nvtx -f true -o output --stats=true
-                    nsys launch -p benchmark -e NSYS_NVTX_PROFILER_REGISTER_ONLY=0 {benchmark_impl}
-                    nsys stats --force-export=true -f csv --force-overwrite=true -o output -r cuda_gpu_kern_sum output.nsys-rep
-                    mv output_cuda_gpu_kern_sum.csv {output_path}
-                """
-                stdout, stderr = proc.communicate(commands)
+            proc = subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            commands = f"""
+                nsys start -c nvtx -f true -o output --stats=true
+                nsys launch -p benchmark -e NSYS_NVTX_PROFILER_REGISTER_ONLY=0 {benchmark_impl}
+                nsys stats --force-export=true -f csv --force-overwrite=true -o output -r cuda_gpu_kern_sum output.nsys-rep
+                mv output_cuda_gpu_kern_sum.csv {output_path}
+            """
+            stdout, stderr = proc.communicate(commands)
             df = pd.read_csv(output_path)
             time_us = df["Avg (ns)"][0] / 1e3
 
         elif profiler == 'ncu':
-            with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
-                commands = f"""
-                    ncu -f --nvtx --print-summary per-nvtx --kernel-id ::flash_fwd_kernel: --csv --metrics gpu__time_duration.avg -o output {benchmark_impl}
-                    ncu -i output.ncu-rep --print-summary per-nvtx --csv > {output_path}
-                """
-                stdout, stderr = proc.communicate(commands)
+            proc = subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            commands = f"""
+                ncu -f --nvtx --print-summary per-nvtx --kernel-id ::flash_fwd_kernel: --csv --metrics gpu__time_duration.avg -o output {benchmark_impl}
+                ncu -i output.ncu-rep --print-summary per-nvtx --csv > {output_path}
+            """
+            stdout, stderr = proc.communicate(commands)
             df = pd.read_csv(output_path)
             time_us = df["Average"][0]
 
         elif profiler == 'rocprof':
-            with subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True) as proc:
-                commands = f"""
-                    echo -e "pmc:\nkernel: mha Attention" > input.txt
-                    rocprof -i input.txt --hsa-trace -o {output_path} {benchmark_impl}
-                """
-                stdout, stderr = proc.communicate(commands)
+            proc = subprocess.Popen(['bash'], cwd=tmp_dir, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            commands = f"""
+                echo -e "pmc:\nkernel: mha Attention" > input.txt
+                rocprof -i input.txt --hsa-trace -o {output_path} {benchmark_impl}
+            """
+            stdout, stderr = proc.communicate(commands)
             df = pd.read_csv(output_path)
             time_us = df["DurationNs"][args.warmup:-1].mean() / 1e3
+
+        
+        if process.returncode != 0:
+            raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
     except Exception as e:
         print("Error:", e)
         exit(1)
