@@ -56,18 +56,24 @@ The following charts show how performance varies with seq_len. Overall, rocm-ver
 
 ### Single sequence
 
-The parameter '--seq-lens' is set to: '128', '256', '512', ... . This means a single sequence of variable length is passed in at a time.   
-
-<img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/duration.png" alt="duration" width="600"/>
-<img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/performance.png" alt="performance" width="600"/>
-<img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/bandwidth.png" alt="bandwidth" width="600"/>
+The parameter '--seq-lens' is set to: '128', '256', '512', ... . This means a single sequence of variable length is passed in at a time.  
+<p align="center">
+  <img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/duration.png" alt="duration" width="600"/>
+</p>
+<p align="center">
+  <img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/performance.png" alt="performance" width="400" style="display: inline-block;"/>
+  <img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/bandwidth.png" alt="bandwidth" width="400" style="display: inline-block;"/>
+</p>
 
 ### Grouped sequences
 
 The parameter '--seq-lens' is set to: '128', '128,128', '128,128,128,128', ... . This means a different number of sequences, each of length 128, are passed in at a time.  
-
-<img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/duration_grouped.png" alt="duration_grouped" width="600"/>
-<img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/performance_grouped.png" alt="performance_grouped" width="600"/>
-<img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/bandwidth_grouped.png" alt="bandwidth_grouped" width="600"/>
+<p align="center">
+  <img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/duration_grouped.png" alt="duration_grouped" width="600"/>
+</p>
+<p align="center">
+  <img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/performance_grouped.png" alt="performance_grouped" width="400" style="display: inline-block;"/>
+  <img src="https://github.com/infdust/benchmark_flashattn/blob/main/assets/bandwidth_grouped.png" alt="bandwidth_grouped" width="400" style="display: inline-block;"/>
+</p>
 
 
