@@ -93,6 +93,10 @@ if __name__ == "__main__":
             df = pd.read_csv(output_path)
             time_us = df["DurationNs"][args.warmup:-1].mean() / 1e3
 
+        else:
+            print(f"Unrecognized profiler: {profiler}")
+            raise
+
     except subprocess.CalledProcessError as e:
         print(f"Command '{e.cmd}' failed with return code {e.returncode}")
         print(f"Output: {e.output}")
