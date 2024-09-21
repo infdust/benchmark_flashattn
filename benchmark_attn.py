@@ -88,6 +88,7 @@ if __name__ == "__main__":
         
         if process.returncode != 0:
             raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
+            exit(1)
     except Exception as e:
         print("Error:", e)
         exit(1)
