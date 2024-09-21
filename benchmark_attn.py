@@ -26,8 +26,12 @@ if __name__ == "__main__":
     flops = 0
     bytes = 0
     for seq_len in seq_lens:
-        flops += 4 * seq_len * seq_len * args.q_heads * args.head_size
-        bytes += 8 * seq_len * args.q_heads * args.head_size
+        # q * k
+        flops += 2 * seq_len * seq_len * (args.q_heads * args.head_size)
+        bytes += 2 * (seq_len * args.q_heads * args.head_size + args.q_heads * args.head_size * seq_len)
+        # qk * v
+        flops += 2 * seq_len * (args.q_heads * args.head_size) * seq_len
+        bytes += 2 * (args.q_heads * args.head_size * seq_len + seq_len * args.q_heads * args.head_size)
     
     if not os.path.exists(tmp_dir):
         try:
@@ -82,6 +86,7 @@ if __name__ == "__main__":
             time_us = df["DurationNs"][args.warmup:-1].mean() / 1e3
     except Exception as e:
         print("Error:", e)
+    print(f"arguments: seq_lens={args.seq_lens}, heads={args.q_heads}, kvheads={args.kv_heads}, head_size={args.head_size}")
     print(f"duration: {time_us:.2f} us")
-    print(f"{flops/time_us/1e6:.2f} Tflops")
-    print(f"{bytes/time_us/1e3:.2f} GB/s")
+    print(f"flops: {flops/time_us/1e6:.2f} Tflops")
+    print(f"bandwidth: {bytes/time_us/1e3:.2f} GB/s")
